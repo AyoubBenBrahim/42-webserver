@@ -1,0 +1,75 @@
+#resources
+
+
+We can split the concepts of WEBSERV to 4 Sections
+
+1 -> Sockets
+	http is a Application layer protocol and it's built on top of a reliable Transport layer TCP
+	so we need to have a basic understanding of TCP and how to create a TCP connection between two hosts to exchange data
+	TCP is built in Kernal Space and Operating Systems provide an API to work with TCP 'SOCKET API':
+
+	https://b-ok.africa/book/1165015/603637: Effective TCP IP Programming. this book contain everything you need to know about Sockets in c and some best practices for network applications.
+	ps: you don't need to read the whole book. first chapters, chapters discusing TCP trasnport layer and a chapter for inplementing a basic http server.
+
+
+2 -> HTTP protocol
+	to implement a http server we need to know how http works .
+	all the resources I've found about HTTP were explaining the protocol for users and they don't explain the implentation aspects.
+	RFC are the only place where we can find the implementation details . there 5 documents discusing the http/1.1 but some parts are not mandatory to implement
+	so we need just the first 2 documents.:
+	https://www.rfc-editor.org/rfc/rfc7230
+	https://www.rfc-editor.org/rfc/rfc7231
+
+	this document from firefox is good two but it's refers to RFC's for details
+	https://developer.mozilla.org/fr/docs/Web/HTTP
+
+	this one for versions of http . // we are implementing http/1.1 but there are some rules to deal with requests from other versions.
+	https://datatracker.ietf.org/doc/html/rfc2145
+
+3 -> Config file
+	the config file is a implementation defined part for http servers . RFC doesn't say anything about config file
+	so we need to implement the config file as we want . most of us get inspired by NGINX
+	these are some linkes for who nginx config file works.
+	- How nginx processes a request
+	https://nginx.org/en/docs/http/request_processing.html
+	- Understanding Nginx Server and Location Block Selection Algorithms
+	https://www.digitalocean.com/community/tutorials/understanding-nginx-server-and-location-block-selection-algorithms
+
+	ps : most of thing you have to figure out through Testing with nginx
+
+
+4 -> CGI GETWAY
+	the same problem here all documents out there discuss CGI for programmers that want to write CGI scripts but none of them discuss the implementation details and who servers impelent the CGI part
+	have a look at these to understand who CGI works
+	https://www.tcl.tk/man/aolserver3.0/cgi-ch1.html
+	https://datatracker.ietf.org/doc/html/rfc3875
+	http://www.mnuwer.dbasedeveloper.co.uk/dlearn/web/session01.htm
+
+	for implemetation the RFC is the onlu document that discuss the server implementation
+	https://www.rfc-editor.org/rfc/rfc3875
+
+
+
+-> architecture there are many HTTP Server architectures out there.
+but according to the subject we can't use threads and multiple processes. the most used architectures are multiThread and processes architectures.
+https://berb.github.io/diploma-thesis/community/042_serverarch.html this link discuss server architecture . we have to implement the single processes evnet driven.
+
+google this concept 'Non-blocking I/O Multiplexing Patterns' this how you are going to serve all clients without blokcing in a single processe evnet driven design.
+
+
+
+-> - UPLOAD
+	the upload part was the most ambiguous part of the project. these links discuss how nginx implement upload
+	https://stackoverflow.com/questions/36429470/nginx-file-upload-with-client-body-in-file-only
+	https://stackoverflow.com/questions/6564643/copy-large-files-over-2-gb-in-php
+	https://stackoverflow.com/questions/44371643/nginx-php-failing-with-large-file-uploads-over-6-gb/44751210#44751210
+	https://github.com/ardinusawan/Nginx-direct-file-upload-without-passing-them-through-backend
+	most of students understood this part in different way. good luck with this part hhh.
+
+
+
+-> bonus // I didn't use this link. but was used but all other students
+https://childish-muenster-804.notion.site/webserv-ca16fa9e822640a9aad5a2bf314e7974
+
+subject
+	https://cdn.intra.42.fr/pdf/pdf/36819/en.subject.pdf

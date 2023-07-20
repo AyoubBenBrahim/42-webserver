@@ -1,0 +1,107 @@
+[[server]]
+    port = 8000
+    host =     "79.29.28.10"
+# this is a comment skip it
+    server_name = "webserv.com"
+    root = "    img "
+    autoindex = "ON"
+    upload_path =  "www"
+
+    [[server.error_page]]
+        401 = " /errors/4xx.html"
+        403 = "/errors/4xx.html"
+        501 = "/errors/5xx.html"
+        500 = "/errors/5xx.html"
+        502 = "/errors/5xx.html"
+        503 = "/errors/5xx.html"
+        504 = "/errors/5xx.html"
+
+    [[server.location]]
+        uri = "%.go$"
+        allow_methods = ["GET", "POST"]
+        cgi_path = "./www/cgi-bin"
+
+    index = ["index.html", "index.htm", "index.php"]
+    # 10B 10K 10M 10G 
+    client_max_body_size = "2G"
+
+    [[server.location]]
+        uri = "%.py$"
+        allow_methods = ["GET", "POST"]
+        cgi_path = "www/cgi-bin"
+
+    [[server.location]]
+        uri = "/"
+        allow_methods = ["GET", "POST"]
+        autoindex = "ON"
+
+    [[server.location]]
+        uri = "/upload"
+        allow_methods = ["GET", "POST", "DELETE"]
+        autoindex = "ON"
+
+    [[server.location]]
+        uri = "/assets"
+        allow_methods = ["GET"]
+        autoindex = "ON"
+
+    [[server.location]]
+        uri = "/yo"
+        allow_methods = ["GET", "POST", "DELETE"]
+        autoindex = "ON"
+        return = "301 https://www.youtube.com/watch?v=eLaIVnI-N6Q"
+
+    [[server.location]]
+        uri = "/redirection"
+        return = "301 /test.html"
+
+[[server]]
+    port = 8081
+    root = "srcs"
+    host = "127.0.0.1"
+    server_name = "example_1.com"
+
+[[server]]
+    port = 9090
+    host = "192.168.10.11"
+    server_name = "example_2.com"
+    root = "./srcs"
+
+    [[server.location]]
+        uri = "/l3erbi"
+        allow_methods = ["GET"]
+        autoindex = "ON"
+
+    [[server.error_page]]
+        401 = "/errors/4xx.html"
+
+[[server]]
+    port = 9000
+    host =     "10.12.18.19"
+    server_name = "wordpress.com"
+    root = "srcs"
+    autoindex = "OFF"
+    upload_path  = "img"
+
+    [[server.error_page]]
+        401 = "/errors/4xx.html"
+        501 = "/errors/5xx.html"
+# listen
+# root
+# uri
+#
+#location /php {
+#		allowed_methods GET,POST;
+#		cgiPath cgi-bin/php-cgi;
+#		cgiExt php;
+#	}
+#location /python {
+#	cgiPath /usr/local/bin/python3;
+#	cgiExt py;
+#}
+#
+#location cgi-bin {
+#      root ./;                                                 # cgi-bin location, mandatory parameter
+#      cgi_path /usr/bin/python3 /bin/bash;                     # location of interpreters installed on the current system, mandatory parameter
+#      cgi_ext .py .sh;                                         # extensions for executable files, mandatory parameter
+#  }
