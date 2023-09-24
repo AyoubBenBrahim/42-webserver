@@ -3,7 +3,7 @@
     host =     "79.29.28.10"
 # this is a comment skip it
     server_name = "webserv.com"
-    root = "    img "
+    root = "    ./inc "
     autoindex = "ON"
     upload_path =  "www"
 
@@ -81,7 +81,7 @@
     server_name = "wordpress.com"
     root = "srcs"
     autoindex = "OFF"
-    upload_path  = "img"
+    upload_path  = "conf"
 
     [[server.error_page]]
         401 = "/errors/4xx.html"

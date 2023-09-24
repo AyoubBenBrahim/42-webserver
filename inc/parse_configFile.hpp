@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -43,7 +45,7 @@ enum ContextType
     CONTEXT_UNKNOWN
 };
 
-class Server
+class ServerSettings
 {
 public:
     int port;
@@ -59,7 +61,7 @@ public:
     std::string serverChunk;
 };
 
-void                        splitByServer(const std::string &buffer, std::vector<Server> &servers);
+void                        splitByServer(const std::string &buffer, std::vector<ServerSettings> &servers);
 int                         countSubstr(const std::string &str, const std::string &substr);
 void                        trim(std::string &str);
 bool                        indentation(std::string line, size_t expected_spaces);
@@ -67,8 +69,8 @@ int                         strToInt(const std::string &str);
 bool                        isInRange(int num, int lower_bound, int upper_bound);
 bool                        is_comment(std::string line);
 bool                        isValidPath(const std::string& path);
-void                        parseDirectives(std::vector<Server> &server);
-void                        check_inter_block_space(std::vector<Server> &servers);
+void                        parseDirectives(std::vector<ServerSettings> &server);
+void                        check_inter_block_space(std::vector<ServerSettings> &servers);
 in_addr                     parseIPAddress(const char *ipAddressString, int serverNbr);
 void                        manageDirectivesErrors(int serverNumber, DirectiveType directiveType);
 void                        manageContextsErrors(int serverNumber, ContextType contextType, int contextID);
@@ -85,8 +87,8 @@ int                         getErrorpageKey(std::string key, int serverNbr, int 
 std::string                 getErrorpageValue(std::string key, std::string value, int serverNbr, int errorPage);
 std::string                 getAllowedMethods(std::string value, int serverNbr, int locationID);
 void                        supportedContexts(std::map<std::string, ContextType> &supportedContextsMap);
-void                        getValidDirectives(std::vector<Server> &server, std::map<std::string, std::string> encounteredDirectivesMap, int serverID);
-void                        getValidContexts(std::vector<Server> &server, std::map<std::string, std::string> encounteredContextsMap, int serverID);
-void                        mannageContexts(std::vector<Server> &server, int serverID, ChildSectionStruct childSection);
+void                        getValidDirectives(std::vector<ServerSettings> &server, std::map<std::string, std::string> encounteredDirectivesMap, int serverID);
+void                        getValidContexts(std::vector<ServerSettings> &server, std::map<std::string, std::string> encounteredContextsMap, int serverID);
+void                        mannageContexts(std::vector<ServerSettings> &server, int serverID, ChildSectionStruct childSection);
 void                        checkForMandatoryDirectives(const std::map<std::string, std::string>& encounteredDirectivesMap, int serverID);
 

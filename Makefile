@@ -1,40 +1,40 @@
+NAME		= webserv
 
-NAME 			= webserv
+CXX			= c++
+CFLAGS		= -Wall -Wextra -Werror -std=c++98
+INCLUDES	= -Iinc
+HEADERS		= inc/parse_configFile.hpp \
+        	  inc/Server.hpp
+SRCDIR		= srcs
+OBJDIR		= OBJS
+SOURCES		= $(shell find $(SRCDIR) -name "*.cpp")
+OBJECTS		= $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SOURCES))
 
-CC 				= c++
-CFLAGS 			= -Wall -Wextra -Werror -std=c++98
-INCLUDES 		= -Iinc
-SRCDIR 			= srcs
-OBJDIR 			= OBJS
-SOURCES 		= $(shell find $(SRCDIR) -name "*.cpp")
-OBJECTS 		= $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SOURCES))
+RED = \033[41m
+GREEN = \033[42m
+NC = \033[0m
 
-RED				=	\033[41m
-GREEN			=	\033[42m
-NC				=	\033[0m
+all: $(NAME)
 
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp | $(OBJDIR)
+	@mkdir -p $(@D)
+	@$(CXX) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-all				: $(NAME)
+$(NAME): $(OBJECTS)
+	@$(CXX) $(CFLAGS) $(INCLUDES) $^ -o $@
+	@echo "$(GREEN)Build Successful ............[OK]$(NC)"
 
-$(OBJDIR)/%.o	: $(SRCDIR)/%.cpp
-				  	@mkdir -p $(@D)
-				  	@$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+$(OBJDIR):
+	@mkdir -p $(OBJDIR)
 
-$(NAME)			: $(OBJECTS)
-					@$(CC) $(CFLAGS) $(INCLUDES) $^ -o $@
-					@echo "${GREEN}Build Successful ............[OK]${NC}"
+clean:
+	@rm -rf $(OBJDIR)
+	@echo "$(RED)Cleaning Objects...[OK]$(NC)"
 
-$(OBJDIR)		:
-					@mkdir -p $(OBJDIR)
+fclean: clean
+	@rm -f $(NAME)
+	@echo "$(RED)Cleaning All.......[OK]$(NC)"
 
-clean			:
-					@rm -rf $(OBJDIR)
-					@echo "${RED}Cleaning Objects...[OK]${NC}" 
+re: fclean all
 
-fclean			: clean
-					@rm -f $(NAME)
-					@echo "${RED}Cleaning All.......[OK]${NC}" 
-
-re				: fclean all
-
-.PHONY			: all clean fclean re
+.PHONY: all clean fclean re

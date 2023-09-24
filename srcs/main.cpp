@@ -1,8 +1,13 @@
 
-#include "../inc/parse_configFile.hpp"
+#include "parse_configFile.hpp"
+#include "Server.hpp"
 
+// #define TEST_CONFIG_FILE
+
+#ifdef TEST_CONFIG_FILE
 int main() 
 {
+
     std::ifstream file("conf/default.toml");
 
     if (!file)
@@ -19,7 +24,7 @@ int main()
 
     std::string buffer = bufferStream.str();
 
-    std::vector<Server> servers;
+    std::vector<ServerSettings> servers;
     splitByServer(buffer, servers);
     parseDirectives(servers);
 
@@ -57,5 +62,36 @@ int main()
         std::cout << "=============================================\n";
     }
 
+   
+
+    
     return 0;
 }
+#endif
+
+bool isNumber(const std::string& input) {
+    std::istringstream iss(input);
+    double number;
+    return (iss >> number) && (iss.eof());
+}
+
+int main(int argc, char **argv)
+{
+    if (argc != 2) {
+        std::cerr << "Usage: ./webserv <config_file>" << std::endl;
+        return 1;
+    }
+
+    std::string port = argv[1];
+    if (!isNumber(port)) {
+        std::cerr << "Invalid port number" << std::endl;
+        return 1;
+    }
+    Server server = Server();
+    server.run();
+}
+
+
+
+
+

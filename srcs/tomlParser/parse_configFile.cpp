@@ -1,4 +1,4 @@
-#include "../../inc/parse_configFile.hpp"
+#include "parse_configFile.hpp"
 
 void trim(std::string &str)
 {
@@ -507,12 +507,12 @@ std::string getCGIpath(std::string value, int serverNbr, ContextType contextType
     return value;
 }
 
-void splitByServer(const std::string &buffer, std::vector<Server> &servers)
+void splitByServer(const std::string &buffer, std::vector<ServerSettings> &servers)
 {
     std::istringstream iss(buffer);
     std::string line;
     std::ostringstream currentChunk;
-    Server server;
+    ServerSettings server;
 
     if (std::getline(iss, line))
     {
@@ -560,7 +560,7 @@ void splitByServer(const std::string &buffer, std::vector<Server> &servers)
                 currentChunk.clear();
 
                 servers.push_back(server);
-                server = Server();
+                server = ServerSettings();
 
                 continue;
             }
@@ -576,7 +576,7 @@ void splitByServer(const std::string &buffer, std::vector<Server> &servers)
     std::string lastChunk = currentChunk.str();
     if (!lastChunk.empty())
     {
-        server = Server();
+        server = ServerSettings();
         server.serverChunk = lastChunk;
         servers.push_back(server);
     }
@@ -615,7 +615,7 @@ void checkForMandatoryDirectives(const std::map<std::string, std::string> &encou
     }
 }
 
-void getValidDirectives(std::vector<Server> &server, std::map<std::string, std::string> encounteredDirectivesMap, int serverID)
+void getValidDirectives(std::vector<ServerSettings> &server, std::map<std::string, std::string> encounteredDirectivesMap, int serverID)
 {
     std::map<std::string, DirectiveType> supportedDirectivesMap;
 
@@ -685,7 +685,7 @@ void supportedContexts(std::map<std::string, ContextType> &supportedContextsMap)
     supportedContextsMap["return"] = RETURN;
 }
 
-void getValidContexts(std::vector<Server> &server, std::map<std::string, std::string> encounteredContextsMap, int serverID)
+void getValidContexts(std::vector<ServerSettings> &server, std::map<std::string, std::string> encounteredContextsMap, int serverID)
 {
     std::map<std::string, ContextType> supportedContextsMap;
 
@@ -735,7 +735,7 @@ void getValidContexts(std::vector<Server> &server, std::map<std::string, std::st
     server[serverID].vec_of_locations.push_back(map_of_locations);
 }
 
-void mannageContexts(std::vector<Server> &server, int serverID, ChildSectionStruct childSection)
+void mannageContexts(std::vector<ServerSettings> &server, int serverID, ChildSectionStruct childSection)
 {
     std::istringstream content(childSection.content);
     std::string inner_line;
@@ -779,7 +779,7 @@ void mannageContexts(std::vector<Server> &server, int serverID, ChildSectionStru
         getValidContexts(server, encounteredContextsMap, serverID);
 }
 
-void parseDirectives(std::vector<Server> &server)
+void parseDirectives(std::vector<ServerSettings> &server)
 {
     int emptyLinesCounter = 0;
     int directivesCounter = server.size();
