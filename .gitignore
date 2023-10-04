@@ -1,0 +1,11 @@
+objs/
+*.o
+*.a
+*.txt
+*.DS_Store
+a.out
+*.out.dSYM/
+*.old
+.vscode/
+webserver
+test/

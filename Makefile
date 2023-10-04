@@ -6,7 +6,7 @@ INCLUDES	= -Iinc
 HEADERS		= inc/parse_configFile.hpp \
         	  inc/Server.hpp
 SRCDIR		= srcs
-OBJDIR		= OBJS
+OBJDIR		= objs
 SOURCES		= $(shell find $(SRCDIR) -name "*.cpp")
 OBJECTS		= $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SOURCES))
 
