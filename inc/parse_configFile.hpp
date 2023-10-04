@@ -61,6 +61,7 @@ public:
     std::string serverChunk;
 };
 
+void                        parseConfigFile(const std::string &configFilePath, std::vector<ServerSettings> &http_servers);
 void                        splitByServer(const std::string &buffer, std::vector<ServerSettings> &servers);
 int                         countSubstr(const std::string &str, const std::string &substr);
 void                        trim(std::string &str);

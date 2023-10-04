@@ -68,8 +68,5 @@ google this concept 'Non-blocking I/O Multiplexing Patterns' this how you are go
 
 
 
--> bonus // I didn't use this link. but was used but all other students
+-> bonus 
 https://childish-muenster-804.notion.site/webserv-ca16fa9e822640a9aad5a2bf314e7974
-
-subject
-	https://cdn.intra.42.fr/pdf/pdf/36819/en.subject.pdf

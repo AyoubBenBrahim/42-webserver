@@ -883,3 +883,26 @@ void parseDirectives(std::vector<ServerSettings> &server)
         exit(0);
     }
 }
+
+void parseConfigFile(const std::string &configFilePath, std::vector<ServerSettings> &http_servers)
+{
+     // std::ifstream file("conf/default.toml");
+    std::ifstream file(configFilePath.c_str());
+
+    if (!file)
+        throw std::runtime_error("[ERROR]: Unable to open the file \"" + configFilePath + "\"");
+
+    // Read the file content into a buffer string
+    std::string line;
+    std::ostringstream bufferStream;
+    while (std::getline(file, line))
+        bufferStream << line << '\n';
+
+     // std::stringstream ss;
+    // ss << file.rdbuf(); // check if this allowed in c++98
+    // buffer = ss.str();
+
+    std::string buffer = bufferStream.str();
+    splitByServer(buffer, http_servers);
+    parseDirectives(http_servers);
+}
