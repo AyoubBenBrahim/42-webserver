@@ -1,6 +1,6 @@
-#include "parse_configFile.hpp"
+#include "ParseConfigFile.hpp"
 
-void trim(std::string &str)
+void ParseConfigFiletrim(std::string &str)
 {
     std::string whitespace = " \t\r\n";
     size_t start = str.find_first_not_of(whitespace);

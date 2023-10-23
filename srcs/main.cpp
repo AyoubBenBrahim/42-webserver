@@ -1,10 +1,9 @@
 
-#include "parse_configFile.hpp"
+#include "ParseConfigFile.hpp"
 #include "Server.hpp"
+#include "AcceptorSockets.hpp"
 
-#define TEST_CONFIG_FILE
 
-#ifdef TEST_CONFIG_FILE
 int main(int argc, char **argv)
 {
     if (argc != 2)
@@ -58,19 +57,13 @@ int main(int argc, char **argv)
         }
     }
 
+    
+
    
 
     
     return 0;
 }
-#endif
-
-// int main()
-// {
-//     Server server = Server();
-//     server.run();
-// }
-
 
 
 
