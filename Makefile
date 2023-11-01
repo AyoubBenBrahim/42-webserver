@@ -3,8 +3,9 @@ NAME		= webserv
 CXX			= c++
 CFLAGS		= -Wall -Wextra -Werror -std=c++98
 INCLUDES	= -Iinc
-HEADERS		= inc/parse_configFile.hpp \
-        	  inc/Server.hpp
+HEADERS		= inc/ParseConfigFile.hpp \
+        	  inc/Server.hpp \
+			  inc/AcceptorSockets.hpp
 SRCDIR		= srcs
 OBJDIR		= objs
 SOURCES		= $(shell find $(SRCDIR) -name "*.cpp")

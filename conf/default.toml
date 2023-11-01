@@ -6,6 +6,10 @@
     root = "    ./inc "
     autoindex = "ON"
     upload_path =  "www"
+    index = ["index.html", "index.htm", "index.php"]
+    # 10B 10K 10M 10G 
+    client_max_body_size = "2G"
+    max_clients = 100
 
     [[server.error_page]]
         401 = " /errors/4xx.html"
@@ -20,10 +24,6 @@
         uri = "%.go$"
         allow_methods = ["GET", "POST"]
         cgi_path = "./www/cgi-bin"
-
-    index = ["index.html", "index.htm", "index.php"]
-    # 10B 10K 10M 10G 
-    client_max_body_size = "2G"
 
     [[server.location]]
         uri = "%.py$"
@@ -60,12 +60,14 @@
     root = "srcs"
     host = "127.0.0.1"
     server_name = "example_1.com"
+    max_clients = 100
 
 [[server]]
     port = 9090
     host = "192.168.10.11"
     server_name = "example_2.com"
     root = "./srcs"
+    client_max_body_size = "2G"
 
     [[server.location]]
         uri = "/l3erbi"
@@ -74,6 +76,18 @@
 
     [[server.error_page]]
         401 = "/errors/4xx.html"
+
+[[server]]
+    port = 9000
+    host =     "10.12.18.19"
+    server_name = "wordpress.com"
+    root = "srcs"
+    autoindex = "OFF"
+    upload_path  = "conf"
+
+    [[server.error_page]]
+        401 = "/errors/4xx.html"
+        501 = "/errors/5xx.html"
 
 [[server]]
     port = 9000

@@ -1,6 +1,6 @@
 #include "ParseConfigFile.hpp"
 
-void ParseConfigFiletrim(std::string &str)
+void trim(std::string &str)
 {
     std::string whitespace = " \t\r\n";
     size_t start = str.find_first_not_of(whitespace);
@@ -35,6 +35,8 @@ bool is_comment(std::string line)
 
 int strToInt(const std::string &str)
 {
+    // std::cout << " start " << str << std::endl;
+
     char *endPtr;
     long value = strtol(str.c_str(), &endPtr, 10);
     if (*endPtr != '\0' || endPtr == str.c_str())
@@ -43,19 +45,13 @@ int strToInt(const std::string &str)
     if (value < std::numeric_limits<int>::min() || value > std::numeric_limits<int>::max())
         return -1;
 
+    // std::cout << " end " << std::endl;
+
     return static_cast<int>(value);
 }
 
 bool isValidPath(const std::string &path)
 {
-    // DIR *dir = opendir(path.c_str());
-    // if (dir != NULL)
-    // {
-    //     closedir(dir);
-    //     return true;
-    // }
-    // return false;
-
     std::ifstream file(path.c_str());
     return file.good();
 }
@@ -120,6 +116,10 @@ void manageDirectivesErrors(int serverNumber, DirectiveType directiveType)
         std::cerr << "[ERROR] in Server[" << serverNumber + 1 << "].CLIENT_MAX_BODY_SIZE" << std::endl;
         std::cerr << "  Invalid max body size." << std::endl;
         std::cerr << "  valid format: 10B 10K 10M 10G" << std::endl;
+        break;
+    case MAX_CLIENTS:
+        std::cerr << "[ERROR] in Server[" << serverNumber + 1 << "].MAX_CLIENTS" << std::endl;
+        std::cerr << "  Invalid max clients number." << std::endl;
         break;
     case DIRECTIVE_AUTOINDEX:
         std::cerr << "[ERROR] in Server[" << serverNumber + 1 << "].AUTOINDEX" << std::endl;
@@ -592,6 +592,7 @@ void supportedDirectives(std::map<std::string, DirectiveType> &supportedDirectiv
     supportedDirectivesMap["client_max_body_size"] = CLIENT_MAX_BODY_SIZE;
     supportedDirectivesMap["autoindex"] = DIRECTIVE_AUTOINDEX;
     supportedDirectivesMap["upload_path"] = UPLOAD;
+    supportedDirectivesMap["max_clients"] = MAX_CLIENTS;
 }
 
 void checkForMandatoryDirectives(const std::map<std::string, std::string> &encounteredDirectivesMap, int serverID)
@@ -669,6 +670,15 @@ void getValidDirectives(std::vector<ServerSettings> &server, std::map<std::strin
             case UPLOAD:
                 server[serverID].upload_path = getUploadPath(value, serverID);
                 break;
+            case MAX_CLIENTS:
+            {
+                std::istringstream iss(value);
+                if (!(iss >> server[serverID].max_clients) || !isInRange(server[serverID].max_clients, 1, 1000))
+                    manageDirectivesErrors(serverID, directiveType);
+                
+                server[serverID].max_clients = server[serverID].max_clients;
+            }
+                break;
             default:
                 break;
             }
@@ -735,7 +745,7 @@ void getValidContexts(std::vector<ServerSettings> &server, std::map<std::string,
     server[serverID].vec_of_locations.push_back(map_of_locations);
 }
 
-void mannageContexts(std::vector<ServerSettings> &server, int serverID, ChildSectionStruct childSection)
+void manageContexts(std::vector<ServerSettings> &server, int serverID, ChildSectionStruct childSection)
 {
     std::istringstream content(childSection.content);
     std::string inner_line;
@@ -782,7 +792,7 @@ void mannageContexts(std::vector<ServerSettings> &server, int serverID, ChildSec
 void parseDirectives(std::vector<ServerSettings> &server)
 {
     int emptyLinesCounter = 0;
-    int directivesCounter = server.size();
+    int directivesCounter = 0;
 
     for (size_t i = 0; i < server.size(); ++i)
     {
@@ -790,6 +800,7 @@ void parseDirectives(std::vector<ServerSettings> &server)
         std::string line;
         std::ostringstream currentChildContent;
         std::string currentChildHeader;
+        bool keepParsingDirectives = true;
 
         std::map<std::string, std::string> encounteredDirectives;
 
@@ -803,12 +814,13 @@ void parseDirectives(std::vector<ServerSettings> &server)
 
             if (!indentation(line, 8) && !indentation(line, 4))
             {
-                std::cout << " *** INDENTATION ERROR *** \"" << line << "\"" << std::endl;
+                std::cout << " *** BAD INDENTATION *** \"" << line << "\"" << std::endl;
                 exit(0);
             }
 
             if (line.find("[[server.") != std::string::npos && line.find("[[server.") < line.find("]]"))
             {
+                keepParsingDirectives = false;
                 if (indentation(line, 4))
                 {
                     std::string childHeader = line.substr(2, line.length());
@@ -828,7 +840,7 @@ void parseDirectives(std::vector<ServerSettings> &server)
                         childSection.header = currentChildHeader;
                         childSection.content = childContent;
 
-                        mannageContexts(server, i, childSection);
+                        manageContexts(server, i, childSection);
                     }
 
                     currentChildHeader = childHeader;
@@ -839,6 +851,11 @@ void parseDirectives(std::vector<ServerSettings> &server)
             }
             if (indentation(line, 4))
             {
+                if (!keepParsingDirectives)
+                {
+                    std::cerr << "Error: invalid File structure, E.g directives bloc first then followed by locations\"" << line << "\"" << std::endl;
+                    exit(0);
+                }
                 trim(line);
                 size_t equalsPos = line.find('=');
                 if (equalsPos != std::string::npos)
@@ -871,15 +888,20 @@ void parseDirectives(std::vector<ServerSettings> &server)
             childSection.header = currentChildHeader;
             childSection.content = lastChildContent;
 
-            mannageContexts(server, i, childSection);
+            manageContexts(server, i, childSection);
         }
         getValidDirectives(server, encounteredDirectives, i);
         directivesCounter += countSubstr(server[i].serverChunk, "[[");
     }
 
-    if (emptyLinesCounter != directivesCounter)
+    // spaces = locations + (servers - 1)    
+    if (emptyLinesCounter != (int)(directivesCounter + server.size() - 1))
     {
-        std::cerr << "[ERROR]: " << emptyLinesCounter - directivesCounter << " Extra Empty Lines in the file." << std::endl;
+        int extraLines = emptyLinesCounter - (directivesCounter + server.size() - 1);
+        if (extraLines < 0)
+            std::cerr << "[ERROR]: " << -extraLines << " Missing Empty Lines in the file." << std::endl;
+        else
+            std::cerr << "[ERROR]: " << extraLines << " Extra Empty Lines in the file." << std::endl;
         exit(0);
     }
 }

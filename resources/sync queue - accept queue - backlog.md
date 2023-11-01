@@ -36,7 +36,9 @@ The process of connection creation in TCP is called the three-way handshake. It 
 [article](https://levelup.gitconnected.com/deep-dive-into-tcp-connection-establishment-process-f6cfb7b4e8e1)
 
 
-When a syn packet arrives, server-side Linux kernel creates a connection request and saves it in a way historically referred to as a queue; you can stumble upon it elsewhere by the names of “half-open connection queue”, an “incomplete connection queue”, a “SYN queue”
+When a syn packet arrives, server-side Linux kernel creates a connection request and saves it in a way historically referred to as a queue; you can stumble upon it elsewhere by the names of “half-open connection queue”, an “incomplete connection queue”, a “SYN queue”, “connection request queue”.
+
+After an ack packet has arrived, connection request is removed from a connection request queue and a connection socket is created. It’s put in another queue which is known by a variety of names: accept queue, backlog queue, pending connection queue, or connection backlog. When a server application “accepts” a connection (using some command that boils down to an accept system call), it simply dequeues an existing socket from an accept queue.
 
 [article](https://levelup.gitconnected.com/deep-dive-into-tcp-connection-establishment-process-f6cfb7b4e8e1)
 

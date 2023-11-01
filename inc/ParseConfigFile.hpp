@@ -31,6 +31,7 @@ enum DirectiveType
     CLIENT_MAX_BODY_SIZE,
     DIRECTIVE_AUTOINDEX,
     UPLOAD,
+    MAX_CLIENTS,
     DIRECTIVE_UNKNOWN
 };
 
@@ -56,6 +57,7 @@ public:
     std::string upload_path;
     std::vector<std::string> index_vec;
     std::size_t client_max_body_size;
+    std::size_t max_clients;
     std::map<int, std::string> map_of_error_page;
     std::vector<std::map<std::string, std::string> > vec_of_locations;
     std::string serverChunk;
@@ -90,6 +92,6 @@ std::string                 getAllowedMethods(std::string value, int serverNbr, 
 void                        supportedContexts(std::map<std::string, ContextType> &supportedContextsMap);
 void                        getValidDirectives(std::vector<ServerSettings> &server, std::map<std::string, std::string> encounteredDirectivesMap, int serverID);
 void                        getValidContexts(std::vector<ServerSettings> &server, std::map<std::string, std::string> encounteredContextsMap, int serverID);
-void                        mannageContexts(std::vector<ServerSettings> &server, int serverID, ChildSectionStruct childSection);
+void                        manageContexts(std::vector<ServerSettings> &server, int serverID, ChildSectionStruct childSection);
 void                        checkForMandatoryDirectives(const std::map<std::string, std::string>& encounteredDirectivesMap, int serverID);
 

@@ -1,0 +1,20 @@
+[[server]]
+    port = 1313
+    host =     "127.0.0.1"
+    server_name = "wordpress1.com"
+    root = "srcs"
+    max_clients = 2
+
+[[server]]
+    port = 3737
+    host =     "127.0.0.1"
+    server_name = "wordpress2.com"
+    root = "srcs"
+    max_clients = 3
+
+[[server]]
+    port = 4242
+    host =     "127.0.0.1"
+    server_name = "wordpress3.com"
+    root = "srcs"
+    max_clients = 4
