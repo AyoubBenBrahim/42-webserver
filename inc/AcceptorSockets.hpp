@@ -19,25 +19,25 @@
 class AcceptorSockets
 {
 private:
-    int _AcceptorSocketFd;
-    int listen_port;
-    in_addr host;
-    int backlogQueueMax; // max clients
-    struct sockaddr_in _addr;
-    socklen_t _addrlen;
+    int                 _AcceptorSocketFd;
+    int                 listen_port;
+    in_addr             host;
+    size_t              backlogQueueMax; // max clients
+    struct sockaddr_in  _addr;
+    socklen_t           _addrlen;
+    std::vector<int>    _clientsFD;
 
 public:
     AcceptorSockets(in_addr host, int port, int max_clients);
     ~AcceptorSockets(void);
 
-    void socketAPI(void);
-
-    void create_socket(void);
-    void bind_socket(void);
-    void listen_socket(void);
-    int accept_socket(int clientCount);
-    bool checkMaxClients(int clientCount);
-    int getSocketFd() const;
-    struct sockaddr_in getSockAddr() const;
-    socklen_t getAddrLen() const;
+    void                socketAPI(void);
+    void                create_socket(void);
+    void                bind_socket(void);
+    void                listen_socket(void);
+    int                 accept_socket(void);
+    bool                checkMaxClients(void);
+    int                 getSocketFd() const;
+    struct sockaddr_in  getSockAddr() const;
+    socklen_t           getAddrLen() const;
 };

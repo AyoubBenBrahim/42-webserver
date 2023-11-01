@@ -78,7 +78,7 @@ void Server::acceptConnections()
             {
                 if (inputEventsContainer[k].fd == serverFD && inputEventsContainer[k].revents & POLLIN)
                 {
-                    int newClient = acceptor.accept_socket(clientsFDs_Container.size());
+                    int newClient = acceptor.accept_socket();
                     if (newClient == -1 || newClient == -503)
                         continue;
                     clientsFDs_Container.push_back(newClient);

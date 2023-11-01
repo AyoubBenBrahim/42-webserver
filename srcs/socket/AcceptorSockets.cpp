@@ -113,7 +113,7 @@ void AcceptorSockets::listen_socket()
     // std::cout << "Listening on port " << this->listen_port << std::endl;
 }
 
-int AcceptorSockets::accept_socket(int clientCount)
+int AcceptorSockets::accept_socket()
 {
     int newClientFd = accept(_AcceptorSocketFd, (struct sockaddr *)&_addr, &_addrlen);
     std::cout << "newClient just connected: " << newClientFd << std::endl;
@@ -129,17 +129,18 @@ int AcceptorSockets::accept_socket(int clientCount)
         }
         return -1;
     }
-    if (!checkMaxClients(clientCount + 1))
+    if (!checkMaxClients())
     {
         close(newClientFd);
         return -503; // HTTP status code 503 indicates that the server is temporarily unable to handle the request due to being overloaded 
     }
+    this->_clientsFD.push_back(newClientFd);
     return newClientFd;
 }
 
-bool AcceptorSockets::checkMaxClients(int clientCount)
+bool AcceptorSockets::checkMaxClients()
 {
-    if (clientCount > this->backlogQueueMax)
+    if (this->_clientsFD.size() >= this->backlogQueueMax)
     {
         std::cout << "ERROR: Max clients connections reached\n";
         return false;
