@@ -2,6 +2,7 @@ NAME		= webserv
 
 CXX			= c++
 CFLAGS		= -Wall -Wextra -Werror -std=c++98
+# CFLAGS		= -Wall -Wextra -Werror -std=c++11
 INCLUDES	= -Iinc
 HEADERS		= inc/ParseConfigFile.hpp \
         	  inc/Server.hpp \

@@ -1,5 +1,6 @@
 #include "AcceptorSockets.hpp"
-
+#include <iostream>
+#include <iterator>
 
 AcceptorSockets::AcceptorSockets(in_addr host, int port, int max_clients)
 {
@@ -14,7 +15,7 @@ AcceptorSockets::~AcceptorSockets()
 }
 
 void AcceptorSockets::socketAPI()
-{
+{ 
     this->create_socket();
     this->bind_socket();
     this->listen_socket();
@@ -140,10 +141,42 @@ int AcceptorSockets::accept_socket()
 
 bool AcceptorSockets::checkMaxClients()
 {
+    std::cout << "this->_clientsFD.size() = " << this->_clientsFD.size() << " backLogQueueMax = " << this->backlogQueueMax << std::endl;
+    printClientsFDs();
     if (this->_clientsFD.size() >= this->backlogQueueMax)
     {
-        std::cout << "ERROR: Max clients connections reached\n";
+        std::cerr << "ERROR: Max clients connections reached\n";
         return false;
     }
     return true;
+}
+
+void AcceptorSockets::removeClient(int client)
+{
+    std::cout << "==== before remove client: " << client << std::endl;
+    for (size_t i = 0; i < this->_clientsFD.size(); i++)
+    {
+        std::cout << "this->_clientsFD[" << i << "] = " << this->_clientsFD[i] << std::endl;
+    }
+    std::cout << "sz1 " <<  this->_clientsFD.size() << std::endl;
+
+    std::vector<int>::iterator it = this->_clientsFD.begin();
+    while (it != this->_clientsFD.end())
+    {
+        if (*it == client)
+        {
+            this->_clientsFD.erase(it);
+            break;
+        }
+        ++it;
+    }
+
+    std::cout << "==== after remove client: " << client << std::endl;
+
+    for (size_t i = 0; i < this->_clientsFD.size(); i++)
+    {
+        std::cout << "this->_clientsFD[" << i << "] = " << this->_clientsFD[i] << std::endl;
+    }
+        std::cout << "sz2 " <<  this->_clientsFD.size() << std::endl;
+
 }

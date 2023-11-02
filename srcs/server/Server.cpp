@@ -1,5 +1,6 @@
 
 #include "Server.hpp"
+#include <cassert>
 
 Server::Server()
 {
@@ -33,22 +34,15 @@ void Server::setupServerConnections()
 
 void Server::acceptConnections()
 {
-    std::map<int, AcceptorSockets>::iterator it = this->acceptorSockets.begin();
+    std::map<int, AcceptorSockets>::iterator it;
     std::map<int, AcceptorSockets>::iterator ite = this->acceptorSockets.end();
+
+    std::map<int, AcceptorSockets*>::iterator it2;
+    std::map<int, AcceptorSockets*>::iterator ite2 = this->clientsFDs_Container.end();
 
     while (true)
     {
         std::vector<pollfd> inputEventsContainer;
-        // std::fill(fds.begin(), fds.end(), pollfd());
-
-        size_t i = 0;
-        for (; i < clientsFDs_Container.size(); i++)
-        {
-            pollfd tmp;
-            tmp.fd = clientsFDs_Container[i];
-            tmp.events = POLLIN;
-            inputEventsContainer.push_back(tmp);
-        }
 
         for (it = this->acceptorSockets.begin(); it != ite; ++it)
         {
@@ -56,7 +50,14 @@ void Server::acceptConnections()
             tmp.fd = it->first;
             tmp.events = POLLIN;
             inputEventsContainer.push_back(tmp);
-            ++i;
+        }
+
+        for (it2 = this->clientsFDs_Container.begin(); it2 != ite2; ++it2)
+        {
+            pollfd tmp;
+            tmp.fd = it2->first;
+            tmp.events = POLLIN;
+            inputEventsContainer.push_back(tmp);
         }
 
         errno = 0;
@@ -68,35 +69,36 @@ void Server::acceptConnections()
             throw std::runtime_error("poll() failed");
         }
 
-          // Check for new client connections
-        for (it = this->acceptorSockets.begin(); it != ite; ++it)
+        for (size_t k = 0; k < acceptorSockets.size(); k++)
         {
-            int serverFD = it->first;
-            AcceptorSockets& acceptor = it->second;
-
-            for (size_t k = 0; k < inputEventsContainer.size(); k++)
+            if (inputEventsContainer[k].revents & POLLIN)
             {
-                if (inputEventsContainer[k].fd == serverFD && inputEventsContainer[k].revents & POLLIN)
-                {
-                    int newClient = acceptor.accept_socket();
-                    if (newClient == -1 || newClient == -503)
-                        continue;
-                    clientsFDs_Container.push_back(newClient);
-                }
+                std::cout << "***Accepting new client connection for server [" << k+1 << "]***" << std::endl;
+                std::map<int, AcceptorSockets>::iterator it = this->acceptorSockets.begin();
+                std::advance(it, k);
+                assert(inputEventsContainer[k].fd == it->first);
+                int newClient = it->second.accept_socket();
+                if (newClient == -1 || newClient == -503)
+                    continue;
+
+                clientsFDs_Container.insert(std::pair<int, AcceptorSockets*>(newClient, &(it->second)));
+                std::cout << std::endl;
             }
         }
 
-        std::cout << "fds.size() = " << inputEventsContainer.size() << std::endl;
-        std::cout << "FDs_Container.size() = " << clientsFDs_Container.size() << std::endl;
-
         // Handle client connections
-        for (size_t j = 0; j < inputEventsContainer.size() - acceptorSockets.size(); j++)
+        for (size_t j = acceptorSockets.size(); j < inputEventsContainer.size(); j++)
         {
             if (inputEventsContainer[j].revents & POLLIN)
             {
                 read_socket(inputEventsContainer[j].fd);
             }
         }
+
+        std::cout << "fds_Container" << std::endl;
+        printFdsContainer(inputEventsContainer);
+        std::cout << "FDs_Container" << std::endl;
+        printMap(clientsFDs_Container);
     }
 }
 
@@ -111,13 +113,12 @@ void Server::read_socket(int clientFD)
     // read() returns 0 ==> client closed the connection. remove its FD
     if (valread == 0)
     {
-        for (std::vector<int>::iterator it = this->clientsFDs_Container.begin(); it != this->clientsFDs_Container.end(); it++)
+        std::map<int, AcceptorSockets*>::iterator it = this->clientsFDs_Container.find(clientFD);
+        if (it != this->clientsFDs_Container.end())
         {
-            if (*it == clientFD)
-            {
-                this->clientsFDs_Container.erase(it);
-                break;
-            }
+            it->second->removeClient(clientFD);
+            std::cout << "Client " << clientFD << " disconnected" << std::endl;
+            this->clientsFDs_Container.erase(it);
         }
         close(clientFD);
     }

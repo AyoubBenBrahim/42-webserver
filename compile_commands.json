@@ -1,0 +1,7 @@
+[
+  {
+    "directory": "/Users/aybouras/Desktop/42-webserver",
+    "command": "clang++ -Wextra -Wall -std=c++98 -I/Users/aybouras/Desktop/42-webserver/inc",
+    "file": "/Users/aybouras/Desktop/42-webserver/srcs/main.cpp"
+  }
+]
