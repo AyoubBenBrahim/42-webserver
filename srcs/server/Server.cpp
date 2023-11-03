@@ -1,6 +1,7 @@
 
 #include "Server.hpp"
 #include <cassert>
+#include <iostream>
 
 Server::Server()
 {
@@ -18,6 +19,18 @@ Server::~Server()
 void Server::runServer()
 {
     this->setupServerConnections();
+
+
+    std::map<int, AcceptorSockets>::iterator it;
+    std::map<int, AcceptorSockets>::iterator ite = this->acceptorSockets.end();
+
+    for (it = this->acceptorSockets.begin(); it != ite; ++it)
+    {
+        std::cout << "key: " << it->first << " value: " << &(it->second) << std::endl;
+        std::cout << "Sever IP: " << it->second.getServerIpPort() << std::endl;
+        std::cout << "--------------------------\n";
+    }
+
     this->acceptConnections();
 }
 
@@ -73,10 +86,10 @@ void Server::acceptConnections()
         {
             if (inputEventsContainer[k].revents & POLLIN)
             {
-                std::cout << "***Accepting new client connection for server [" << k+1 << "]***" << std::endl;
                 std::map<int, AcceptorSockets>::iterator it = this->acceptorSockets.begin();
                 std::advance(it, k);
-                assert(inputEventsContainer[k].fd == it->first);
+                std::cout << "***Accepting new client connection for server [" << it->second.getServerIpPort() << "]***" << std::endl;
+                assert(inputEventsContainer[k].fd == it->first);// ***DEBUG***
                 int newClient = it->second.accept_socket();
                 if (newClient == -1 || newClient == -503)
                     continue;
@@ -95,9 +108,9 @@ void Server::acceptConnections()
             }
         }
 
-        std::cout << "fds_Container" << std::endl;
+        std::cout << "fds_Container --> ";
         printFdsContainer(inputEventsContainer);
-        std::cout << "FDs_Container" << std::endl;
+        std::cout << "FDs_Container --> ";
         printMap(clientsFDs_Container);
     }
 }

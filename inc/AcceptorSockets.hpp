@@ -27,15 +27,20 @@ private:
     socklen_t           _addrlen;
     std::vector<int>    _clientsFD;
 
+    // any attempt to copy an object will result in a compile-time error
+    // AcceptorSockets(const AcceptorSockets& src);
+    // AcceptorSockets& operator=(const AcceptorSockets& src);
+
 public:
     AcceptorSockets(in_addr host, int port, int max_clients);
-    // AcceptorSockets(const AcceptorSockets &src) = delete;
-    // AcceptorSockets &operator=(const AcceptorSockets &src) = delete;
     ~AcceptorSockets(void);
 
     void                socketAPI(void);
     void                create_socket(void);
+    void                setSocketAddress(void);
+    void                setSocketReuseAddr(void);
     void                bind_socket(void);
+    void                setSocketNonBlocking(void);
     void                listen_socket(void);
     int                 accept_socket(void);
     bool                checkMaxClients(void);
@@ -43,6 +48,7 @@ public:
     struct sockaddr_in  getSockAddr() const;
     socklen_t           getAddrLen() const;
     void                removeClient(int client);
+    std::string        getServerIpPort() const;
 
     void printClientsFDs(void)
     {

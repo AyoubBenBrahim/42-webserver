@@ -8,8 +8,6 @@ class Server
 private:
     std::vector<ServerSettings> http_servers;
     std::map<int, AcceptorSockets> acceptorSockets;
-
-    // std::vector<int> clientsFDs_Container;
     std::map<int, AcceptorSockets*> clientsFDs_Container;
 
 public:
