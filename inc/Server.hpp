@@ -10,6 +10,8 @@ private:
     std::map<int, AcceptorSockets> acceptorSockets;
     std::map<int, AcceptorSockets*> clientsFDs_Container;
 
+    std::vector<struct kevent> eventList;
+
 public:
     Server();
     Server(std::vector<ServerSettings> http_servers);
@@ -18,8 +20,13 @@ public:
     void acceptConnections();
     void runServer();
     void printServerSettings();
-    void read_socket(int client);
-    void write_socket(int client, const std::string& message);
+    void read_socket(int clientFD);
+    void read_socket2(int clientFD, void *serverFd);
+    void write_socket(int clientFD, const std::string& message);
+
+    void acceptConnectionskqueue();
+
+    void clientDisconnected(int clientFD, void* serverFd);
 
     void printFdsContainer(std::vector<pollfd> fdsContainer)
     {

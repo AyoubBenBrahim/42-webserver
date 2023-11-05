@@ -27,7 +27,7 @@ void AcceptorSockets::socketAPI()
     this->setSocketAddress();
     this->setSocketReuseAddr();
     this->bind_socket();
-    // this->setSocketNonBlocking();
+    this->setSocketNonBlocking();
     this->listen_socket(); // passive socket aka listening for incoming connections
 }
 
@@ -147,6 +147,9 @@ void AcceptorSockets::listen_socket()
     }
 }
 
+/*
+    (EINTR), non-blocking operation (EAGAIN), or no connections available (EWOULDBLOCK).
+*/
 int AcceptorSockets::accept_socket()
 {
     int newClientFd = accept(_AcceptorSocketFd, (struct sockaddr *)&_addr, &_addrlen);
@@ -178,7 +181,7 @@ bool AcceptorSockets::checkMaxClients()
     printClientsFDs();
     if (this->_clientsFD.size() >= this->backlogQueueMax)
     {
-        std::cerr << "ERROR: Max clients connections reached\n";
+        std::cerr << "[ Max clients connections reached ] \n";
         return false;
     }
     return true;

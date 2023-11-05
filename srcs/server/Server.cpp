@@ -3,6 +3,11 @@
 #include <cassert>
 #include <iostream>
 
+
+#include <sys/event.h>
+#include <vector>
+
+
 Server::Server()
 {
 }
@@ -26,12 +31,13 @@ void Server::runServer()
 
     for (it = this->acceptorSockets.begin(); it != ite; ++it)
     {
-        std::cout << "key: " << it->first << " value: " << &(it->second) << std::endl;
+        std::cout << "ServerFD: " << it->first << " instance: " << &(it->second) << std::endl;
         std::cout << "Sever IP: " << it->second.getServerIpPort() << std::endl;
         std::cout << "--------------------------\n";
     }
 
-    this->acceptConnections();
+    // this->acceptConnections();
+    this->acceptConnectionskqueue();
 }
 
 void Server::setupServerConnections()
@@ -77,7 +83,7 @@ void Server::acceptConnections()
         int result = poll(inputEventsContainer.data(), inputEventsContainer.size(), -1);
         if (result == -1)
         {
-            if (errno == EINTR)
+            if (errno == EINTR) // (interrupted system call)
                 continue;
             throw std::runtime_error("poll() failed");
         }
@@ -112,6 +118,120 @@ void Server::acceptConnections()
         printFdsContainer(inputEventsContainer);
         std::cout << "FDs_Container --> ";
         printMap(clientsFDs_Container);
+    }
+}
+
+// udata : user-defined value passed through the kernel unchanged.
+const uint64_t SERVER_UDATA = 1337;
+
+void Server::acceptConnectionskqueue() {
+    std::map<int, AcceptorSockets>::iterator it;
+    std::map<int, AcceptorSockets>::iterator ite = this->acceptorSockets.end();
+
+    int kq = kqueue();
+    if (kq == -1) {
+        throw std::runtime_error("kqueue() failed");
+    }
+    // Register acceptor sockets for reading events
+    for (it = this->acceptorSockets.begin(); it != ite; ++it) {
+        struct kevent serverEvent;
+        EV_SET(&serverEvent, it->first, EVFILT_READ, EV_ADD, 0, 0, reinterpret_cast<void *>(SERVER_UDATA));
+        eventList.push_back(serverEvent);
+    }
+
+    while (true) {
+     std::vector<struct kevent> triggeredEvents(eventList.size());
+        int eventCount = kevent(kq, eventList.data(), eventList.size(), triggeredEvents.data(), triggeredEvents.size(), NULL);
+        if (eventCount == -1) {
+            if (errno == EINTR)
+                continue;
+            throw std::runtime_error("kevent() failed in event loop");
+        }
+        for (int i = 0; i < eventCount; ++i) {
+            struct kevent& event = triggeredEvents[i];
+
+            // Event is for the server socket (new client connection)
+            if (event.udata == reinterpret_cast<void*>(SERVER_UDATA)) {
+                std::cout << "SERVER_UDATA = " << static_cast<int>(SERVER_UDATA) << std::endl;
+                int acceptorSocketFD = event.ident;
+                it = this->acceptorSockets.find(acceptorSocketFD);
+                std::cout << "***Accepting new client connection for server [" << it->second.getServerIpPort() << "]***" << std::endl;
+                if (it == this->acceptorSockets.end()) {
+                    throw std::runtime_error("acceptor socket not found");
+                }
+                int newClient = it->second.accept_socket();
+                if (newClient == -1 || newClient == -503) {
+                    // Handle error
+                    // std::cerr << "accept() failed" << std::endl;
+                    continue;
+                }
+                clientsFDs_Container.insert(std::make_pair(newClient, &(it->second)));
+                std::cout << "New client connected: " << newClient << std::endl;
+
+                // Add new client socket to the event list
+                struct kevent clientEvent;
+                EV_SET(&clientEvent, newClient, EVFILT_READ, EV_ADD, 0, 0, reinterpret_cast<void*>(acceptorSocketFD));
+                eventList.push_back(clientEvent);
+            } else {
+                // Event is for a client socket (data available to read)
+                if (event.flags & EV_EOF) {
+                    // Client closed the connection
+                    std::cout << "Client " << event.ident << " *** disconnected ****" << std::endl;
+                    clientDisconnected(event.ident, event.udata);
+                    continue;
+                }
+                int clientFd = event.ident;
+                std::cout << "Data available to read from client: " << clientFd << std::endl;
+                read_socket2(clientFd, event.udata);
+            }
+        }
+    }
+}
+
+void Server::clientDisconnected(int clientFD, void* serverFd) {
+    std::vector<struct kevent>::iterator it = eventList.begin();
+        std::vector<struct kevent>::iterator ite = eventList.end();
+        while (it != ite)
+        {
+            if (static_cast<int>(it->ident) == clientFD)
+            {
+                eventList.erase(it);
+                break;
+            }
+            ++it;
+        }
+
+        std::map<int, AcceptorSockets>::iterator iterServer = this->acceptorSockets.find(static_cast<int>(reinterpret_cast<intptr_t>(serverFd)));
+        if (iterServer != this->acceptorSockets.end())
+        {
+            iterServer->second.removeClient(clientFD);
+            std::cout << "Client " << clientFD << " disconnected" << std::endl;
+        }
+        close(clientFD);
+}
+
+void Server::read_socket2(int clientFD, void* udata) // serverFD
+{
+    char buffer[1024] = {0};
+    int valread = read(clientFD, buffer, sizeof(buffer));
+    if (valread == -1)
+    {
+        throw std::runtime_error("read() failed");
+    }
+    // read() returns 0 ==> client closed the connection. remove its FD
+    if (valread == 0)
+    {
+        clientDisconnected(clientFD, udata);
+    }
+    else
+    {
+        // Process the received message
+        std::string message(buffer);
+        std::cout << "Received message from client " << clientFD << ": " << message << std::endl;
+
+        // Send a response back to the client
+        std::string response = "Server received your message: " + message;
+        write_socket(clientFD, response);
     }
 }
 
