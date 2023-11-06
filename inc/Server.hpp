@@ -17,14 +17,16 @@ public:
     Server(std::vector<ServerSettings> http_servers);
     ~Server();
     void setupServerConnections();
-    void acceptConnections();
     void runServer();
     void printServerSettings();
-    void read_socket(int clientFD);
-    void read_socket2(int clientFD, void *serverFd);
+    // void read_socket(int clientFD);
+    void read_socket(int clientFD, void *serverFd);
     void write_socket(int clientFD, const std::string& message);
 
-    void acceptConnectionskqueue();
+    // void acceptConnections();
+    // void acceptConnectionskqueue();
+    void pollEventHandler();
+    void kqueueEventHandler();
 
     void clientDisconnected(int clientFD, void* serverFd);
 
