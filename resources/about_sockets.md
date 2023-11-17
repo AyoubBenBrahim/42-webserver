@@ -110,3 +110,8 @@ his means the O_NONBLOCK flag has been added to the existing flags.
 
 The socket is an abstract object from which messages are sent and received, much like a file is an abstract object on which file data is read and written. 
 
+===
+
+`kern.ipc.somaxconn`
+
+"somaxconn" stands for "Socket Option MAX CONNections." It represents a kernel parameter that defines the maximum backlog value for TCP connections. The backlog value determines the maximum number of pending connections that the operating system can queue before rejecting new incoming connections.
