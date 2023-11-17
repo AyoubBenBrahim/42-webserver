@@ -114,4 +114,10 @@ The socket is an abstract object from which messages are sent and received, much
 
 `kern.ipc.somaxconn`
 
-"somaxconn" stands for "Socket Option MAX CONNections." It represents a kernel parameter that defines the maximum backlog value for TCP connections. The backlog value determines the maximum number of pending connections that the operating system can queue before rejecting new incoming connections.
+= "somaxconn" stands for "Socket Option MAX CONNections." It represents a kernel parameter that defines the maximum backlog value for TCP connections. The backlog value determines the maximum number of pending connections that the operating system can queue before rejecting new incoming connections.
+
+= If the backlog value specified in the listen function is set to 0, it typically indicates that the socket should use the system's default backlog value. The system's default backlog value is determined by the somaxconn parameter or the operating system's default configuration.
+
+= If the backlog value specified in the listen function is larger than the maximum allowed by the operating system, the operating system will limit the backlog to its maximum allowable value.
+
+= When defining the backlog value in the listen function while programming network applications, the value specified in the listen function takes priority over the system's somaxconn parameter.
