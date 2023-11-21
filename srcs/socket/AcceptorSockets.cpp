@@ -3,11 +3,15 @@
 #include <iterator>
 #include <string>
 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+
 AcceptorSockets::AcceptorSockets(in_addr host, int port, int max_clients)
 {
     this->listen_port = port;
     this->host = host;
-    this->backlogQueueMax = (max_clients == 0) ? 100 : max_clients;
+    this->backlogQueueMax = (max_clients == 0) ? 128 : max_clients;
     this->_addrlen = sizeof(_addr);
 }
 
@@ -106,6 +110,8 @@ void AcceptorSockets::setSocketReuseAddr()
     {
         throw std::runtime_error("setsockopt() failed");
     }
+
+ 
 }
 
 /*
@@ -129,6 +135,8 @@ void AcceptorSockets::setSocketNonBlocking() {
     if (fcntl(_AcceptorSocketFd, F_SETFL, flags) == -1) {
         throw std::runtime_error("fcntl() failed");
     }
+
+   
 }
 
 void AcceptorSockets::bind_socket()
@@ -156,21 +164,21 @@ int AcceptorSockets::accept_socket()
     std::cout << "newClient just connected: " << newClientFd << std::endl;
     if (newClientFd == -1)
     {
-        if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)
-        {
-            throw std::runtime_error("accept() Just for check");
-        }
-        else
-        {
-            throw std::runtime_error("accept() failed");
-        }
+        // if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)
+        // {
+        //     throw std::runtime_error("accept() Just for check");
+        // }
+        // else
+        // {
+        //     throw std::runtime_error("accept() failed");
+        // }
         return -1;
     }
-    if (!checkMaxClients())
-    {
-        close(newClientFd);
-        return -503; // HTTP status code 503 indicates that the server is temporarily unable to handle the request due to being overloaded 
-    }
+    // if (!checkMaxClients())
+    // {
+    //     close(newClientFd);
+    //     return -503; // HTTP status code 503 indicates that the server is temporarily unable to handle the request due to being overloaded 
+    // }
     this->_clientsFD.push_back(newClientFd);
     return newClientFd;
 }

@@ -159,12 +159,17 @@ void Server::kqueueEventHandler() {
 
             // Event is for the server socket (new client connection)
             if (event.udata == reinterpret_cast<void*>(SERVER_UDATA)) {
-                std::cout << "SERVER_UDATA = " << static_cast<int>(SERVER_UDATA) << std::endl;
                 int acceptorSocketFD = event.ident;
                 it = this->acceptorSockets.find(acceptorSocketFD);
-                std::cout << "***Accepting new client connection for server [" << it->second.getServerIpPort() << "]***" << std::endl;
+                // std::cout << "***Accepting new client connection for server [" << it->second.getServerIpPort() << "]***" << std::endl;
                 if (it == this->acceptorSockets.end()) {
                     throw std::runtime_error("acceptor socket not found");
+                }
+                if (clientsFDs_Container.size() >= 100)
+                {
+                    std::string responseMessage = "<h1>503 Service Unavailable</h1>";
+                    std::cout << responseMessage << std::endl;
+                    continue;
                 }
                 int newClient = it->second.accept_socket();
                 if (newClient == -1 || newClient == -503) {

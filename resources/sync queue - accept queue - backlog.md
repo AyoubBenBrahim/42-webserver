@@ -43,3 +43,23 @@ After an ack packet has arrived, connection request is removed from a connection
 [article](https://levelup.gitconnected.com/deep-dive-into-tcp-connection-establishment-process-f6cfb7b4e8e1)
 
 ![alt text](./img/sync_queue.png)
+
+
+### ----------------------
+a must read blog : [TCP Socket Listen: A Tale of Two Queues (2022)](https://arthurchiao.art/blog/tcp-listen-a-tale-of-two-queues/)
+
+### ----------------------
+
+![alt text](./img/TCP-IP.png)
+
+![alt text](./img/handShakeConn.png)
+
+
+![alt text](./img/handSHake_queues.png)
+
+
+![alt text](./img/nginx_loop.png)
+
+
+
+
