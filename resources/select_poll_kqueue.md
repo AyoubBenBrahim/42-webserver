@@ -1,3 +1,6 @@
+
+intro : https://nima101.github.io/io_multiplexing
+
 The time complexity (Big O notation) of each event handling mechanism can be described as follows:
 
 1. `select`:
