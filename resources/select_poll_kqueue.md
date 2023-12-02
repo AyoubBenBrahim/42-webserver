@@ -6,7 +6,7 @@ kqueue : https://nima101.github.io/kqueue_server
 
 Using metaphors to describe the mechanisms, we can liken select, poll and epoll to different types of individuals:
 
-Using metaphors to describe the mechanisms, we can liken `poll` and `epoll` to different types of individuals:
+These metaphors provide imaginative ways to understand the mechanisms at a high level.
 
 1. `poll`: In a metaphorical sense, `poll` can be represented by a persistent and vigilant security guard stationed at a gate. This guard continuously asks each person passing by, "Are you ready to enter? Are you ready to enter?" until someone finally provides the necessary authorization or permission to pass through.
 
@@ -16,12 +16,11 @@ Using metaphors to describe the mechanisms, we can liken `poll` and `epoll` to d
 
 4. `kqueue`: can be metaphorically represented by a versatile event organizer who receives a list of upcoming events and their associated venues. The organizer keeps track of these events and their schedules, and when an event is about to begin, they notify the relevant attendees or parties involved.
 
-5. IO_uring: In a metaphorical sense, IO_uring can be compared to a highly efficient and proactive courier service. When someone needs to send multiple packages to different destinations, they provide a detailed list of packages and their respective addresses to the courier service. The service organizes the deliveries and dispatches multiple couriers simultaneously to handle the packages. Each courier delivers their assigned packages independently, optimizing the overall delivery process and ensuring efficient and timely completion.
+5. `IO_uring`: In a metaphorical sense, IO_uring can be compared to a highly efficient and proactive courier service. When someone needs to send multiple packages to different destinations, they provide a detailed list of packages and their respective addresses to the courier service. The service organizes the deliveries and dispatches multiple couriers simultaneously to handle the packages. Each courier delivers their assigned packages independently, optimizing the overall delivery process and ensuring efficient and timely completion.
 
 In this metaphor, the packages represent I/O operations, the addresses symbolize the destinations or targets for those operations, and the couriers represent the asynchronous I/O handlers provided by IO_uring. The proactive and parallel nature of the courier service reflects the high-performance and parallel I/O capabilities of IO_uring, enabling efficient handling of multiple I/O operations concurrently.
 
 
-These metaphors provide imaginative ways to understand the mechanisms at a high level.
 
 
 The time complexity (Big O notation) of each event handling mechanism can be described as follows:
@@ -59,3 +58,7 @@ Here are some key features and benefits of IO_uring:
 5. User-space polling: With the introduction of the `IORING_OP_POLL_ADD` operation, IO_uring allows applications to perform user-space polling. This means that instead of relying solely on kernel notification mechanisms, applications can directly poll for events in user space, reducing latency and improving control over event handling.
 
 Overall, IO_uring provides a powerful and efficient framework for handling I/O operations in Linux systems. Its design focuses on minimizing overhead, maximizing concurrency, and optimizing performance, making it well-suited for high-performance applications and scenarios with demanding I/O workloads.
+
+***
+
+![alt text](./img/polling.png "polling")
