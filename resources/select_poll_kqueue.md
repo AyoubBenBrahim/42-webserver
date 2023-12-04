@@ -64,3 +64,10 @@ Overall, IO_uring provides a powerful and efficient framework for handling I/O o
 ![alt text](./img/polling.png "polling")
 
 ![alt text](./img/poll_pro_con.png "poll_pro_con")
+
+***
+
+![alt text](./img/longPolling1.png "longPolling1")
+
+![alt text](./img/longPolling2.png "longPolling2")
+

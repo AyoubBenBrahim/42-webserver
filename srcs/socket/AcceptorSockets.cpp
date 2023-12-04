@@ -111,6 +111,12 @@ void AcceptorSockets::setSocketReuseAddr()
         throw std::runtime_error("setsockopt() failed");
     }
 
+     // Disable Nagle's algorithm
+    int flag = 1;
+    if (setsockopt(_AcceptorSocketFd, IPPROTO_TCP, TCP_NODELAY, (char*)&flag, sizeof(int)) == -1) {
+        std::cerr << "Failed to set TCP_NODELAY option" << std::endl;
+        throw std::runtime_error("Failed to set TCP_NODELAY option");
+    }
  
 }
 

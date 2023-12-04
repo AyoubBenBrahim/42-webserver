@@ -28,6 +28,12 @@ These points outline the key elements involved in the TCP handshake process.
 
 ![alt text](./img/sync_queue.png)
 
+low-level details of the TCP handshake process:
+
+![alt text](./img/3WH_kernel_level.png)
+
+*****
+
 SYN cookies are a technique used to mitigate SYN flood attacks by allowing a server to handle connection requests without maintaining a SYN queue.
 
 Here's a high-level overview of how SYN cookies are implemented:
