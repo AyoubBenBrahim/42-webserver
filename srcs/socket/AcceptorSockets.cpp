@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+#include <unistd.h>
 
 AcceptorSockets::AcceptorSockets(in_addr host, int port, int max_clients)
 {
@@ -108,6 +109,7 @@ void AcceptorSockets::setSocketReuseAddr()
     int reuseAddr = 1;
     if (setsockopt(_AcceptorSocketFd, SOL_SOCKET, SO_REUSEADDR, &reuseAddr, sizeof(reuseAddr)) == -1)
     {
+        close(_AcceptorSocketFd);
         throw std::runtime_error("setsockopt() failed");
     }
 
@@ -115,6 +117,7 @@ void AcceptorSockets::setSocketReuseAddr()
     int flag = 1;
     if (setsockopt(_AcceptorSocketFd, IPPROTO_TCP, TCP_NODELAY, (char*)&flag, sizeof(int)) == -1) {
         std::cerr << "Failed to set TCP_NODELAY option" << std::endl;
+        close(_AcceptorSocketFd);
         throw std::runtime_error("Failed to set TCP_NODELAY option");
     }
  
